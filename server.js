@@ -14,6 +14,8 @@ var apiApp = function () {
     app.use(bodyParser.urlencoded({
         "extended": false
     }));
+    
+    app.use(express.static('static'));
 
     router.get("/", function (req, res) {
         res.json({
