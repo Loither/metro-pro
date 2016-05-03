@@ -3,7 +3,7 @@
 var express = require("express");
 var app = express();
 var bodyParser = require("body-parser");
-var mongoOp = require("./model/mongo");
+var mongoOp = require("./model/user");
 var router = express.Router();
 
 var apiApp = function () {
@@ -35,10 +35,7 @@ var apiApp = function () {
                         "message": "Error fetching data"
                     };
                 } else {
-                    response = {
-                        "error": false,
-                        "message": data
-                    };
+                    response = data;
                 }
                 res.json(response);
             });
@@ -46,13 +43,16 @@ var apiApp = function () {
         .post(function (req, res) {
             var db = new mongoOp();
             var response = {};
-            // fetch params from REST request.
-            // Add strict validation when you use this in Production.
-            db.firstName = req.body.firstname;
-            db.lastName = req.body.lastname;
-            db.yearCourse = req.body.yearcourse;
-            db.skills = req.body.skills;
-            db.availability = req.body.availability;
+            // Needs strict validation when used in production!
+            var data = req.body;
+            db.firstName = data.firstName;
+            db.lastName = data.lastName;
+            db.major = data.major;
+            db.yearCourse = data.yearCourse;
+            db.alumni = data.alumni;
+            db.staff = data.staff;
+            db.skills = data.skills;
+            db.availability = data.availability;
             db.save(function (err) {
                 // save() will run insert() command of MongoDB.
                 // --> add new data in collection.
@@ -83,10 +83,7 @@ var apiApp = function () {
                         "message": "Error fetching data"
                     };
                 } else {
-                    response = {
-                        "error": false,
-                        "message": data
-                    };
+                    response = data;
                 }
                 res.json(response);
             });
@@ -102,15 +99,38 @@ var apiApp = function () {
                         "message": "Error fetching data"
                     };
                 } else {
-                    // we got data from Mongo.
-                    // change it accordingly.
+                    // we got data from Mongo --> change it accordingly.
                     if (req.body.firstName !== undefined) {
                         // case where email needs to be updated.
-                        data.userEmail = req.body.firstName;
+                        data.firstName = req.body.firstName;
                     }
                     if (req.body.lastName !== undefined) {
                         // case where password needs to be updated
-                        data.userPassword = req.body.lastName;
+                        data.lastName = req.body.lastName;
+                    }
+                    if (req.body.major !== undefined) {
+                        // case where password needs to be updated
+                        data.major = req.body.major;
+                    }
+                    if (req.body.yearCourse !== undefined) {
+                        // case where password needs to be updated
+                        data.yearCourse = req.body.yearCourse;
+                    }
+                    if (req.body.alumni !== undefined) {
+                        // case where password needs to be updated
+                        data.alumni = req.body.alumni;
+                    }
+                    if (req.body.staff !== undefined) {
+                        // case where password needs to be updated
+                        data.staff = req.body.staff;
+                    }
+                    if (req.body.skills !== undefined) {
+                        // case where password needs to be updated
+                        data.skills = req.body.skills;
+                    }
+                    if (req.body.availability !== undefined) {
+                        // case where password needs to be updated
+                        data.availability = req.body.availability;
                     }
                     // save the data
                     data.save(function (err) {
@@ -151,7 +171,7 @@ var apiApp = function () {
                             };
                         } else {
                             response = {
-                                "error": true,
+                                "error": false,
                                 "message": "Data associated with " + req.params.id + "is deleted"
                             };
                         }
@@ -178,5 +198,5 @@ var apiApp = function () {
     };
 };
 
-var zapp = new apiApp();
-zapp.start();
+var metroProApp = new apiApp();
+metroProApp.start();
