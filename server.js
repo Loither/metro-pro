@@ -14,7 +14,7 @@ var apiApp = function () {
     app.use(bodyParser.urlencoded({
         "extended": false
     }));
-    
+
     app.use(express.static('static'));
 
     router.get("/", function (req, res) {
@@ -179,6 +179,85 @@ var apiApp = function () {
                     });
                 }
             });
+        });
+    
+    // find users (by skills limited with alumni / staff)
+    router.route("/search")
+        .post(function (req, res) {
+            var response = {};
+            var staff = false;
+            var alumni = false;
+        
+            var regexpSkills = [];
+            // wrap all array items with regexp
+            req.body.skills.forEach(function(item){
+                var re = new RegExp(item, "i");
+                regexpSkills.push(re);    
+            });
+        
+            if (req.body.staff !== undefined) {
+                        // case where password needs to be updated
+                        staff = req.body.staff;
+            }
+            if (req.body.staff !== undefined) {
+                        // case where password needs to be updated
+                        alumni = req.body.alumni;
+            }
+            mongoOp
+                .find({skills: {$all: regexpSkills}}).
+                where('staff').equals(staff).
+                where('alumni').equals(alumni).
+                exec(function (err, data) {
+                // This will run Mongo Query to fetch data based on skills in an array.
+                if (err) {
+                    response = {
+                        "error": true,
+                        "message": "Error fetching data"
+                    };
+                } else {
+                    response = data;
+                }
+                res.json(response);
+            });
+        });
+    
+    // find count of users (by skills limited with alumni / staff)
+    router.route("/search/count")
+        .post(function (req, res) {
+            var response = {};
+            var staff = false;
+            var alumni = false;
+        
+            var regexpSkills = [];
+            // wrap all array items with regexp
+            req.body.skills.forEach(function(item){
+                var re = new RegExp(item, "i");
+                regexpSkills.push(re);    
+            });
+        
+            if (req.body.staff !== undefined) {
+                        // case where password needs to be updated
+                        staff = req.body.staff;
+            }
+            if (req.body.staff !== undefined) {
+                        // case where password needs to be updated
+                        alumni = req.body.alumni;
+            }
+            mongoOp
+                .find({skills: {$all: regexpSkills}}).
+                where('staff').equals(staff).
+                where('alumni').equals(alumni).
+                count(function(err, data){
+                if (err) {
+                    response = {
+                        "error": true,
+                        "message": "Error fetching data"
+                    };
+                } else {
+                    response = data;
+                }
+                res.json(response);
+                });
         });
 
 
