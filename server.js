@@ -3,7 +3,8 @@
 var express = require("express");
 var app = express();
 var bodyParser = require("body-parser");
-var mongoOp = require("./model/user");
+var user = require("./model/user");
+var skill = require("./model/skill");
 var router = express.Router();
 
 var apiApp = function () {
@@ -19,15 +20,15 @@ var apiApp = function () {
 
     router.get("/", function (req, res) {
         res.json({
-            "error": false,
-            "message": "Hello World"
+            "error": true,
+            "message": "Hei, jokin meni vikaan sivua ladattaessa. Kokeile päivittää sivu."
         });
     });
 
     router.route("/users")
         .get(function (req, res) {
             var response = {};
-            mongoOp.find({}, function (err, data) {
+            user.find({}, function (err, data) {
                 // Mongo command to fetch all data from collection.
                 if (err) {
                     response = {
@@ -41,18 +42,25 @@ var apiApp = function () {
             });
         })
         .post(function (req, res) {
-            var db = new mongoOp();
+            var db = new user();
+            var db2 = new skill();
             var response = {};
-            // Needs strict validation when used in production!
+            var formattedSkills = [];
             var data = req.body;
             db.firstName = data.firstName;
             db.lastName = data.lastName;
+            db.email = data.email;
             db.major = data.major;
             db.yearCourse = data.yearCourse;
             db.alumni = data.alumni;
             db.staff = data.staff;
-            db.skills = data.skills;
+            data.skills.forEach(function (skill) {
+                formattedSkills.push(skill.toLowerCase());
+                saveSkill(skill);
+            });
+            db.skills = formattedSkills;
             db.availability = data.availability;
+
             db.save(function (err) {
                 // save() will run insert() command of MongoDB.
                 // --> add new data in collection.
@@ -75,7 +83,7 @@ var apiApp = function () {
     router.route("/users/:id")
         .get(function (req, res) {
             var response = {};
-            mongoOp.findById(req.params.id, function (err, data) {
+            user.findById(req.params.id, function (err, data) {
                 // This will run Mongo Query to fetch data based on ID.
                 if (err) {
                     response = {
@@ -90,9 +98,8 @@ var apiApp = function () {
         })
         .put(function (req, res) {
             var response = {};
-            // first find out record exists or not
-            // if it does then update the record
-            mongoOp.findById(req.params.id, function (err, data) {
+            // first find out record exists or not, if it does then update the record
+            user.findById(req.params.id, function (err, data) {
                 if (err) {
                     response = {
                         "error": true,
@@ -101,35 +108,30 @@ var apiApp = function () {
                 } else {
                     // we got data from Mongo --> change it accordingly.
                     if (req.body.firstName !== undefined) {
-                        // case where email needs to be updated.
                         data.firstName = req.body.firstName;
                     }
                     if (req.body.lastName !== undefined) {
-                        // case where password needs to be updated
                         data.lastName = req.body.lastName;
                     }
+                    if (req.body.email !== undefined) {
+                        data.email = req.body.email;
+                    }
                     if (req.body.major !== undefined) {
-                        // case where password needs to be updated
                         data.major = req.body.major;
                     }
                     if (req.body.yearCourse !== undefined) {
-                        // case where password needs to be updated
                         data.yearCourse = req.body.yearCourse;
                     }
                     if (req.body.alumni !== undefined) {
-                        // case where password needs to be updated
                         data.alumni = req.body.alumni;
                     }
                     if (req.body.staff !== undefined) {
-                        // case where password needs to be updated
                         data.staff = req.body.staff;
                     }
                     if (req.body.skills !== undefined) {
-                        // case where password needs to be updated
                         data.skills = req.body.skills;
                     }
                     if (req.body.availability !== undefined) {
-                        // case where password needs to be updated
                         data.availability = req.body.availability;
                     }
                     // save the data
@@ -153,7 +155,7 @@ var apiApp = function () {
         .delete(function (req, res) {
             var response = {};
             // find the data
-            mongoOp.findById(req.params.id, function (err, data) {
+            user.findById(req.params.id, function (err, data) {
                 if (err) {
                     response = {
                         "error": true,
@@ -161,7 +163,7 @@ var apiApp = function () {
                     };
                 } else {
                     // data exists, remove it.
-                    mongoOp.remove({
+                    user.remove({
                         _id: req.params.id
                     }, function (err) {
                         if (err) {
@@ -180,34 +182,82 @@ var apiApp = function () {
                 }
             });
         });
-    
+
+    router.route("/skills")
+        .get(function (req, res) {
+            var response = {};
+            skill.find({}, function (err, data) {
+                // Mongo command to fetch all data from collection.
+                if (err) {
+                    response = {
+                        "error": true,
+                        "message": "Error fetching data"
+                    };
+                } else {
+                    response = data;
+                }
+                res.json(response);
+            });
+        })
+        .post(function (req, res) {
+            var db = new skill();
+            var response = {};
+            // Needs strict validation when used in production!
+            var data = req.body;
+            var formattedSkills = [];
+
+            data.skills.forEach(function (skill) {
+                formattedSkills.push(skill.toLowerCase());
+            });
+
+            db.skills = formattedSkills;
+
+            db.save(function (err) {
+                if (err) {
+                    response = {
+                        "error": true,
+                        "message": "Error adding data"
+                    };
+                } else {
+                    response = {
+                        "error": false,
+                        "message": "Data added"
+                    };
+                }
+                res.json(response);
+            });
+
+        });
+
     // find users (by skills limited with alumni / staff)
     router.route("/search")
         .post(function (req, res) {
             var response = {};
             var staff = false;
             var alumni = false;
-        
+
             var regexpSkills = [];
             // wrap all array items with regexp
-            req.body.skills.forEach(function(item){
+            req.body.skills.forEach(function (item) {
                 var re = new RegExp(item, "i");
-                regexpSkills.push(re);    
+                regexpSkills.push(re);
             });
-        
+
             if (req.body.staff !== undefined) {
-                        // case where password needs to be updated
-                        staff = req.body.staff;
+                staff = req.body.staff;
             }
             if (req.body.staff !== undefined) {
-                        // case where password needs to be updated
-                        alumni = req.body.alumni;
+                alumni = req.body.alumni;
             }
-            mongoOp
-                .find({skills: {$all: regexpSkills}}).
-                where('staff').equals(staff).
-                where('alumni').equals(alumni).
-                exec(function (err, data) {
+            user
+                .find({
+                    skills: {
+                        $all: regexpSkills
+                    }
+                }).
+            where('staff').equals(staff).
+            where('alumni').equals(alumni).
+            exec(function (err, data) {
                 // This will run Mongo Query to fetch data based on skills in an array.
                 if (err) {
                     response = {
@@ -220,34 +270,36 @@ var apiApp = function () {
                 res.json(response);
             });
         });
-    
+
     // find count of users (by skills limited with alumni / staff)
     router.route("/search/count")
         .post(function (req, res) {
             var response = {};
             var staff = false;
             var alumni = false;
-        
+
             var regexpSkills = [];
             // wrap all array items with regexp
-            req.body.skills.forEach(function(item){
+            req.body.skills.forEach(function (item) {
                 var re = new RegExp(item, "i");
-                regexpSkills.push(re);    
+                regexpSkills.push(re);
             });
-        
+
             if (req.body.staff !== undefined) {
-                        // case where password needs to be updated
-                        staff = req.body.staff;
+                staff = req.body.staff;
             }
             if (req.body.staff !== undefined) {
-                        // case where password needs to be updated
-                        alumni = req.body.alumni;
+                alumni = req.body.alumni;
             }
-            mongoOp
-                .find({skills: {$all: regexpSkills}}).
-                where('staff').equals(staff).
-                where('alumni').equals(alumni).
-                count(function(err, data){
+            user
+                .find({
+                    skills: {
+                        $all: regexpSkills
+                    }
+                }).
+            where('staff').equals(staff).
+            where('alumni').equals(alumni).
+            count(function (err, data) {
                 if (err) {
                     response = {
                         "error": true,
@@ -257,10 +309,14 @@ var apiApp = function () {
                     response = data;
                 }
                 res.json(response);
-                });
+            });
         });
 
-
+    function saveSkill(skillToAdd) {
+        var db = new skill();
+        db.skills = skillToAdd.toLowerCase();
+        db.save(function (err) {});
+    }
 
     app.use('/', router);
 

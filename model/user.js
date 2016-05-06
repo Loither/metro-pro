@@ -18,6 +18,7 @@ var mongoSchema = mongoose.Schema;
 var userSchema = {
     "firstName": String,
     "lastName": String,
+    "email": {type: String, unique: true},
     "major": String,
     "yearCourse": {type: Number, min: 1, max: 4},
     "alumni": Boolean,
