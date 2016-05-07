@@ -16,6 +16,7 @@ var mongoSchema = mongoose.Schema;
 
 // create schema
 var userSchema = {
+    "oauth": {type: String, unique: true},
     "firstName": String,
     "lastName": String,
     "email": {type: String, unique: true},

@@ -31,6 +31,17 @@ body {
 ul.dropdown-menu.dropdown-inverse {
     width: 100%;
 }
+
 #tags-list {
     display: inline-block;
+}
+
+.abcRioButtonBlue {
+    background-color: #1abc9c !important;
+    display: inline-block !important;
+}
+
+.abcRioButtonBlue:hover {
+    -webkit-box-shadow: 0 0 3px 3px rgba(10, 74, 61, .3) !important;
+    box-shadow: 0 0 3px 3px rgba(10, 74, 61, .3) !important;
 }

@@ -4,6 +4,8 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="google-signin-scope" content="profile email">
+    <meta name="google-signin-client_id" content="1090259436408-v0d65222ges2gvlppnkjht89g2ma480i.apps.googleusercontent.com">
     <title>MetroPro app</title>
     <!-- Loading App Custom Styles -->
     <link rel="stylesheet" type="text/css" href="css/app.css">
@@ -20,6 +22,47 @@
 </head>
 
 <body>
+    <!-- Modal -->
+    <div id="loginModal" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title" id="modal-title">Kirjaudu sisään</h4>
+                </div>
+                <div class="modal-body" id="modal-body">
+                    <div id="google-sign-in" class="g-signin2" data-onsuccess="onSignIn" data-theme="dark"></div>
+                    <!-- <div id="user-info">
+                        <input type="text" id="firstName" placeholder="Etunimi" class="form-control flat" />
+                        <input type="text" id="lastName" placeholder="Sukunimi" class="form-control flat" />
+                        <input type="text" id="email" placeholder="Sähköposti" class="form-control flat" />
+                    </div> -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Sulje</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <nav class="navbar navbar-default container-fluid" role="navigation">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar-collapse-01">
+                <span class="sr-only">Toggle navigation</span>
+            </button>
+            <a class="navbar-brand" href="#">MetroPro</a>
+        </div>
+        <div class="collapse navbar-collapse" id="navbar-collapse-01">
+            <ul class="nav navbar-nav navbar-right">
+                <li class=""><a data-toggle="modal" data-target="#loginModal">omat tiedot</a></li>
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </nav>
+    <!-- /navbar -->
     <div class="container main">
         <div class="headline">
             <h1 class="logo">
@@ -59,6 +102,7 @@
             </div>
         </div>
     </div>
+    <script src="https://apis.google.com/js/platform.js" async defer></script>
     <script src="js/jquery-1.8.3.min.js"></script>
     <script src="js/jquery-ui-1.10.3.custom.min.js"></script>
     <script src="js/jquery.ui.touch-punch.min.js"></script>
