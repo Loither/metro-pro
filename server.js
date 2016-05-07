@@ -17,25 +17,13 @@ var apiApp = function () {
     }));
 
     app.use(express.static('static'));
-    
+
     app.use(function (req, res, next) {
-
-    // Website you wish to allow to connect
-    res.setHeader('Access-Control-Allow-Origin', 'http://localhost');
-
-    // Request methods you wish to allow
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
-
-    // Request headers you wish to allow
-    res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
-
-    // Set to true if you need the website to include cookies in the requests sent
-    // to the API (e.g. in case you use sessions)
-    res.setHeader('Access-Control-Allow-Credentials', true);
-
-    // Pass to next layer of middleware
-    next();
-});
+        res.setHeader('Access-Control-Allow-Origin', '*');
+        res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
+        res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
+        next();
+    });
 
     router.get("/", function (req, res) {
         res.json({
@@ -66,6 +54,7 @@ var apiApp = function () {
             var response = {};
             var formattedSkills = [];
             var data = req.body;
+            db.oauth = data.oauth;
             db.firstName = data.firstName;
             db.lastName = data.lastName;
             db.email = data.email;
@@ -80,7 +69,7 @@ var apiApp = function () {
             db.skills = formattedSkills;
             db.availability = data.availability;
 
-            db.save(function (err) {
+            db.save(function (err, data) {
                 // save() will run insert() command of MongoDB.
                 // --> add new data in collection.
                 if (err) {
@@ -89,10 +78,7 @@ var apiApp = function () {
                         "message": "Error adding data"
                     };
                 } else {
-                    response = {
-                        "error": false,
-                        "message": "Data added"
-                    };
+                    response = data;
                 }
                 res.json(response);
             });
@@ -140,6 +126,9 @@ var apiApp = function () {
                     }
                     if (req.body.yearCourse !== undefined) {
                         data.yearCourse = req.body.yearCourse;
+                    } 
+                    if (req.body.yearCourse === undefined) {
+                        data.yearCourse = undefined;
                     }
                     if (req.body.alumni !== undefined) {
                         data.alumni = req.body.alumni;
@@ -154,17 +143,14 @@ var apiApp = function () {
                         data.availability = req.body.availability;
                     }
                     // save the data
-                    data.save(function (err) {
+                    data.save(function (err, data) {
                         if (err) {
                             response = {
                                 "error": true,
                                 "message": "Error updating data"
                             };
                         } else {
-                            response = {
-                                "error": false,
-                                "message": "Data is updated for " + req.params.id
-                            };
+                            response = data;
                         }
                         res.json(response);
                     });
@@ -319,6 +305,25 @@ var apiApp = function () {
             where('staff').equals(staff).
             where('alumni').equals(alumni).
             count(function (err, data) {
+                if (err) {
+                    response = {
+                        "error": true,
+                        "message": "Error fetching data"
+                    };
+                } else {
+                    response = data;
+                }
+                res.json(response);
+            });
+        });
+
+    // get user by oauth token
+    router.route("/oauth")
+        .post(function (req, res) {
+            var response = {};
+            user.find({
+                'oauth': req.body.oauth
+            }, function (err, data) {
                 if (err) {
                     response = {
                         "error": true,

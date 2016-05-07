@@ -34,13 +34,52 @@
                 </div>
                 <div class="modal-body" id="modal-body">
                     <div id="google-sign-in" class="g-signin2" data-onsuccess="onSignIn" data-theme="dark"></div>
-                    <!-- <div id="user-info">
-                        <input type="text" id="firstName" placeholder="Etunimi" class="form-control flat" />
-                        <input type="text" id="lastName" placeholder="Sukunimi" class="form-control flat" />
-                        <input type="text" id="email" placeholder="Sähköposti" class="form-control flat" />
-                    </div> -->
+                    <div id="user-info">
+                        <h4 class="demo-panel-title">Perustiedot</h4>
+                        <label>Etunimi</label>
+                        <input type="text" id="firstName" placeholder="Etunimi" class="form-control" />
+                        <label>Sukunimi</label>
+                        <input type="text" id="lastName" placeholder="Sukunimi" class="form-control" />
+                        <label>Sähköposti</label>
+                        <input type="text" id="email" placeholder="Sähköposti" class="form-control" />
+                        <h4 class="demo-panel-title">Opintotiedot</h4>
+                        <label>Pääaine</label>
+                        <input type="text" id="major" placeholder="Pääaine" class="form-control" />
+                        <div class="text-left">
+                            <label for="yearCourse">Vuosikurssi &nbsp;</label>
+                            <select name="yearCourse" id="yearCourse">
+                                <option value="1">1. vuosi</option>
+                                <option value="2">2. vuosi</option>
+                                <option value="3">3. vuosi</option>
+                                <option value="4">4. vuosi</option>
+                                <option value="5">Piilota</option>
+                            </select>
+                        </div>
+                        <h4 class="demo-panel-title">Taidot</h4>
+                        <div class="form-group">
+                            <input name="tagsinput" id="tagsinput2" class="tagsinput" value="" />
+                        </div>
+                        <h4 class="demo-panel-title">Lisämääreet</h4>
+                        <label class="checkbox" for="alumni">
+                            <input type="checkbox" value="" id="alumni" data-toggle="checkbox"> alumni
+                        </label>
+                        <label class="checkbox" for="staff">
+                            <input type="checkbox" value="" id="staff" data-toggle="checkbox"> henkilökunta
+                        </label>
+                        <h4 class="demo-panel-title">Olen kiinnostunut</h4>
+                        <label class="checkbox" for="inno">
+                            <input type="checkbox" value="" id="inno" data-toggle="checkbox"> innoprojektista
+                        </label>
+                        <label class="checkbox" for="thesis">
+                            <input type="checkbox" value="" id="thesis" data-toggle="checkbox"> päättötyöstä
+                        </label>
+                        <label class="checkbox" for="work">
+                            <input type="checkbox" value="" id="work" data-toggle="checkbox"> palkkatyöstä
+                        </label>
+                    </div>
                 </div>
                 <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-dismiss="modal" id="send">Tallenna</button>
                     <button type="button" class="btn btn-default" data-dismiss="modal">Sulje</button>
                 </div>
             </div>
@@ -48,7 +87,7 @@
         </div>
     </div>
 
-    <nav class="navbar navbar-default container-fluid" role="navigation">
+    <nav class="navbar navbar-default" role="navigation">
         <div class="navbar-header">
             <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar-collapse-01">
                 <span class="sr-only">Toggle navigation</span>
@@ -56,14 +95,13 @@
             <a class="navbar-brand" href="#">MetroPro</a>
         </div>
         <div class="collapse navbar-collapse" id="navbar-collapse-01">
-            <ul class="nav navbar-nav navbar-right">
-                <li class=""><a data-toggle="modal" data-target="#loginModal">omat tiedot</a></li>
-            </ul>
+            <button data-toggle="modal" data-target="#loginModal" class="btn btn-default btn-sm navbar-btn navbar-right">omat tiedot</button>
         </div>
         <!-- /.navbar-collapse -->
     </nav>
     <!-- /navbar -->
     <div class="container main">
+        <div id="status"></div>
         <div class="headline">
             <h1 class="logo">
           <div class="logo"><img src="img/icons/svg/clipboard.svg" alt="Clipboard"></div>
@@ -102,7 +140,7 @@
             </div>
         </div>
     </div>
-    <script src="https://apis.google.com/js/platform.js" async defer></script>
+    <script src="js/platform.js"></script>
     <script src="js/jquery-1.8.3.min.js"></script>
     <script src="js/jquery-ui-1.10.3.custom.min.js"></script>
     <script src="js/jquery.ui.touch-punch.min.js"></script>

@@ -32,8 +32,16 @@ ul.dropdown-menu.dropdown-inverse {
     width: 100%;
 }
 
+#status {
+    display: none;
+}
+
 #tags-list {
     display: inline-block;
+}
+
+#user-info {
+    display: none;
 }
 
 .abcRioButtonBlue {
@@ -44,4 +52,17 @@ ul.dropdown-menu.dropdown-inverse {
 .abcRioButtonBlue:hover {
     -webkit-box-shadow: 0 0 3px 3px rgba(10, 74, 61, .3) !important;
     box-shadow: 0 0 3px 3px rgba(10, 74, 61, .3) !important;
+}
+
+.checkbox {
+    text-align: left;
+}
+
+input[type="text"] {
+    margin-bottom: 10px;
+}
+
+.text-left {
+    text-align: left;
+    margin-left: 14px;
 }
