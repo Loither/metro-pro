@@ -31,11 +31,11 @@ http://app-metropro.rhcloud.com
 
 ## Folder structure : 
 
-/server.js - node.js server implementation
-/model/ - user & skill Mongoose models
-/static/ - static html content
-/static/js/ - javascript files for UI
-/static/css/ - css files for UI
+* /server.js - node.js server implementation
+* /model/ - user & skill Mongoose models
+* /static/ - static html content
+* /static/js/ - javascript files for UI
+* /static/css/ - css files for UI
 
 ## License : 
 
