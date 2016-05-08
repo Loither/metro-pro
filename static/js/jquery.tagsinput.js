@@ -151,7 +151,7 @@
         if (userType == 2){staff = true;}
         
         $.ajax({
-            type: 'POST', url: 'http://nodejs-loither.rhcloud.com/search/count',
+            type: 'POST', url: 'http://' + window.location.hostname + '/search/count',
             data: JSON.stringify({"staff": staff,"alumni": alumni,"skills": tagslist}),
             success: function (data) {$('#count').html('(' + data + ')');},
             contentType: "application/json", dataType: 'json'

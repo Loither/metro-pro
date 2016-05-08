@@ -13,7 +13,9 @@ $(function () {
 
     updateSkillsArray();
     setUpElements();
+    var host = 'http://' + window.location.hostname;
     var id;
+    var authId;
 
     function setModalHeader(text) {
         $('#modal-title').html(text);
@@ -26,7 +28,7 @@ $(function () {
     function getUserInfo(profile) {
         $.ajax({
             type: 'POST',
-            url: 'http://nodejs-loither.rhcloud.com/oauth',
+            url: host + '/oauth',
             data: JSON.stringify({
                 "oauth": profile.getId()
             }),
@@ -35,6 +37,7 @@ $(function () {
                     id = data[0]._id;
                     populateUserDataFields(data[0]);
                 } else {
+                    authId = profile.getId();
                     populateSignUpData(profile);
                 }
 
@@ -42,14 +45,6 @@ $(function () {
             contentType: "application/json",
             dataType: 'json'
         });
-    }
-
-    /**
-     *  Get user profile from oauth data
-     */
-
-    function updateUserInfo(profile) {
-        getUserInfo(profile);
     }
 
     /**
@@ -104,7 +99,7 @@ $(function () {
         if (id !== undefined) {
             $.ajax({
                 type: 'PUT',
-                url: 'http://nodejs-loither.rhcloud.com/users/' + id,
+                url: host + '/users/' + id,
                 data: scrapeFormData(),
                 success: function (data) {
                     if (!data.error) {
@@ -119,11 +114,12 @@ $(function () {
         } else {
             $.ajax({
                 type: 'POST',
-                url: 'http://nodejs-loither.rhcloud.com/users',
+                url: host + '/users',
                 data: scrapeFormData(),
                 success: function (data) {
                     if (!data.error) {
                         showStatusMessage('Tiedot tallennettu onnistuneesti.', false);
+                        id = authId;
                     } else {
                         showStatusMessage('Tietojen tallennus epäonnistui.', true);
                     }
@@ -147,8 +143,12 @@ $(function () {
         tmpSkills.forEach(function (item) {
             skills.push(item.toLowerCase());
         });
-
-        tmpUser.oauth = id;
+        
+        if(id !== undefined){
+            tmpUser.oauth = id;   
+        } else {
+            tmpUser.oauth = authId;
+        }
         tmpUser.firstName = $('#firstName').val();
         tmpUser.lastName = $('#lastName').val();
         tmpUser.email = $('#email').val();
@@ -227,10 +227,11 @@ $(function () {
         $('#google-sign-in').fadeOut();
         $('#user-info').fadeIn();
         var profile = googleUser.getBasicProfile();
+        authId = profile.getId();
         setModalHeader('Muokkaa tietoja');
         $('#send').html('Päivitä');
         $('#send').fadeIn();
-        updateUserInfo(profile);
+        getUserInfo(profile);
     };
 
     /**
@@ -249,7 +250,7 @@ $(function () {
         }
         $.ajax({
             type: 'POST',
-            url: 'http://nodejs-loither.rhcloud.com/search',
+            url: host + '/search',
             data: JSON.stringify({
                 "staff": staff,
                 "alumni": alumni,
@@ -360,12 +361,15 @@ $(function () {
      */
 
     function updateSkillsArray() {
-        $.get('http://nodejs-loither.rhcloud.com/skills', function (items) {
-            var skills = [];
-            items.forEach(function (items) {
-                skills.push(items.skills);
-            });
-            setUpTagsInput(skills);
+        $.ajax({
+            url: '/skills',
+            success: function (items) {
+                var skills = [];
+                items.forEach(function (items) {
+                    skills.push(items.skills);
+                });
+                setUpTagsInput(skills);
+            }
         });
     }
 
