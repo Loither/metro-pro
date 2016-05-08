@@ -245,69 +245,130 @@
                 <section>
                     <h2>Tarjotut API-kutsut</h2>
                     <p>Alla on kuvattu rajapinnan tarjoamat kutsut sekä näiden palauttama data esimerkkimuodossa.</p>
-                    <p>Rajapintapalvelu tarjoaa välikerroksen taustalla pyörivän SOLR-toteutuksen ja käyttöliittymän välille. Käyttöliittymä voi rajapinnan kautta hakea, lisätä ja muokata käyttäjätietoa joka tallennetaan tietokantaan. Vastaavasti olemassaolevien käyttäjien osalta voidaan hakea osaamista rajaten hakutuloksia vuosikurssin, saatavuuden ja taitojen perusteella.</p>
+                    <p>Rajapintapalvelu tarjoaa välikerroksen taustalla pyörivän mongodb-tietokannan ja käyttöliittymän välille. Käyttöliittymä voi rajapinnan kautta hakea, lisätä ja muokata käyttäjätietoa joka tallennetaan tietokantaan. Vastaavasti olemassaolevien käyttäjien osalta voidaan hakea osaamista rajaten hakutuloksia käyttäjän, saatavuuden ja taitojen perusteella.</p>
 
-                    <h2>/user</h2>
+                    <h2>/users</h2>
 
-                    <h3><a href="/user?id=xxxyyyzzz">/user?id=xxxyyyzzz</a></h3>
+                    <h3><a href="/users">/users (GET)</a></h3>
+                    <p>Palauttaa kaikki käyttäjät</p>
+
+                    <pre>
+{
+    "oauth": String,
+    "firstName": String,
+    "lastName": String,
+    "email": String,
+    "major": String,
+    "yearCourse": Number,
+    "alumni": Boolean,
+    "staff": Boolean,
+    "skills": Array,
+    "availability": {
+        "inno": Boolean,
+        "thesis": Boolean,
+        "work": Boolean
+    }
+}</pre>
+
+                    <h3><a href="/users/572df66c4425b02d5ac891b2">/users/:id (GET)</a></h3>
                     <p>Palauttaa yksittäisen käyttäjän hakuparametrien mukaisesti</p>
 
                     <pre>
 {
-    "firstName": "Olli",
-    "lastName": "Osaaja",
-    "yearCourse": "2.",
-    "skills": ["java", "javascript", "php", "html"],
-    "availability": "saatavuus"
+    "oauth": String,
+    "firstName": String,
+    "lastName": String,
+    "email": String,
+    "major": String,
+    "yearCourse": Number,
+    "alumni": Boolean,
+    "staff": Boolean,
+    "skills": Array,
+    "availability": {
+        "inno": Boolean,
+        "thesis": Boolean,
+        "work": Boolean
+    }
 }</pre>
 
-                    <h2>/user/add</h2>
-                    <h3><a href="/user/add?firstName=xxx&lastName=yyy&yearCourse=1&skills=['javascript']&availability=now">/user/add?firstName=xxx&lastName=yyy&yearCourse=1&skills=['javascript']&availability=now</a></h3>
+                    <h2>/users (POST)</h2>
                     <p>Lisää yksittäisen käyttäjän annettujen parametrien mukaisesti</p>
 
                     <pre>
 {
-    "firstName": "etunimi",
-    "lastName": "sukunimi",
-    "yearCourse": "vuosikurssi",
-    "skills": ["taidot"],
-    "availability": "saatavuus"
+    "oauth": String,
+    "firstName": String,
+    "lastName": String,
+    "email": String,
+    "major": String,
+    "yearCourse": Number,
+    "alumni": Boolean,
+    "staff": Boolean,
+    "skills": Array,
+    "availability": {
+        "inno": Boolean,
+        "thesis": Boolean,
+        "work": Boolean
+    }
 }</pre>
 
-                    <h2>/user/modify</h2>
-                    <h3><a href="/user/modify?firstName=xxx&lastName=yyy&yearCourse=1&skills=['javascript']&availability=now">/user/modify?firstName=xxx&lastName=yyy&yearCourse=1&skills=["javascript"]&availability=now</a></h3>
+                    <h2>/users/:id (PUT)</h2>
                     <p>Muokkaa yksittäisen käyttäjän tietoja annettujen parametrien mukaisesti</p>
 
                     <pre>
 {
-    "firstName": "etunimi",
-    "lastName": "sukunimi",
-    "yearCourse": "vuosikurssi",
-    "skills": ["taidot"],
-    "availability": "saatavuus"
+    "oauth": String,
+    "firstName": String,
+    "lastName": String,
+    "email": String,
+    "major": String,
+    "yearCourse": Number,
+    "alumni": Boolean,
+    "staff": Boolean,
+    "skills": Array,
+    "availability": {
+        "inno": Boolean,
+        "thesis": Boolean,
+        "work": Boolean
+    }
 }</pre>
 
-                    <h2>/search</h2>
-                    <h3><a href="/search?id=1212&firstName=xxx&lastName=yyy&yearCourse=1&skills=['javascript']&availability=now">/search?id=1212&firstName=xxx&lastName=yyy&yearCourse=1&skills=['javascript']&availability=now</a></h3>
+                    <h2>/users/:id (DELETE)</h2>
+                    <p>Poistaa yksittäisen käyttäjän, vastaus onnistuneesta poistosta:</p>
+
+                    <pre>
+{
+    "error": false,
+    "message": "Data associated with :id is deleted"
+}</pre>
+
+                    <h2>/search (POST)</h2>
                     <p>Palauttaa hakuparametrejä vastaavat tulokset</p>
 
                     <pre>
 {
-    "id": "käyttäjä-id",
-    "firstName": "etunimi",
-    "lastName": "sukunimi",
-    "skill": "taito/taidot",
-    "yearCourse": "vuosikurssi",
-    "availability": "saatavuus"
+    "alumni": Boolean,
+    "staff": Boolean,
+    "skills": Array
 }</pre>
 
-                    <h2>/skills</h2>
-                    <h3><a href="/skills">/skills</a></h3>
-                    <p>Listaa nykyiset tunnetut taidot</p>
+                    <h2>/search/count (POST)</h2>
+                    <p>Palauttaa nykyistä hakua vastaavien tulosten lukumäärän</p>
 
                     <pre>
 {
-    "skills": ["javascript", "java", "php", "python", "html"]
+    "alumni": Boolean,
+    "staff": Boolean,
+    "skills": Array
+}</pre>
+
+                    <h2>Virheviestit rajapinnasta</h2>
+                    <p>Virheet palautetaan muodossa</p>
+
+                    <pre>
+{
+    "error": true,
+    "message": String
 }</pre>
 
 

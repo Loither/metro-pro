@@ -17,6 +17,10 @@ var apiApp = function () {
     }));
 
     app.use(express.static('static'));
+    
+    /**
+     *  Set CORS headers
+     */
 
     app.use(function (req, res, next) {
         res.setHeader('Access-Control-Allow-Origin', '*');
@@ -24,6 +28,10 @@ var apiApp = function () {
         res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
         next();
     });
+    
+    /**
+     *  Fallback route if static file is not available
+     */
 
     router.get("/", function (req, res) {
         res.json({
@@ -31,12 +39,15 @@ var apiApp = function () {
             "message": "Hei, jokin meni vikaan sivua ladattaessa. Kokeile päivittää sivu."
         });
     });
+    
+    /**
+     *  /users (GET/POST)
+     */
 
     router.route("/users")
         .get(function (req, res) {
             var response = {};
             user.find({}, function (err, data) {
-                // Mongo command to fetch all data from collection.
                 if (err) {
                     response = {
                         "error": true,
@@ -70,8 +81,6 @@ var apiApp = function () {
             db.availability = data.availability;
 
             db.save(function (err, data) {
-                // save() will run insert() command of MongoDB.
-                // --> add new data in collection.
                 if (err) {
                     response = {
                         "error": true,
@@ -83,13 +92,15 @@ var apiApp = function () {
                 res.json(response);
             });
         });
-
+    
+    /**
+     *  /users/:id (GET/PUT/DELETE)
+     */
 
     router.route("/users/:id")
         .get(function (req, res) {
             var response = {};
             user.findById(req.params.id, function (err, data) {
-                // This will run Mongo Query to fetch data based on ID.
                 if (err) {
                     response = {
                         "error": true,
@@ -103,7 +114,6 @@ var apiApp = function () {
         })
         .put(function (req, res) {
             var response = {};
-            // first find out record exists or not, if it does then update the record
             user.findById(req.params.id, function (err, data) {
                 if (err) {
                     response = {
@@ -111,7 +121,6 @@ var apiApp = function () {
                         "message": "Error fetching data"
                     };
                 } else {
-                    // we got data from Mongo --> change it accordingly.
                     if (req.body.firstName !== undefined) {
                         data.firstName = req.body.firstName;
                     }
@@ -142,7 +151,6 @@ var apiApp = function () {
                     if (req.body.availability !== undefined) {
                         data.availability = req.body.availability;
                     }
-                    // save the data
                     data.save(function (err, data) {
                         if (err) {
                             response = {
@@ -159,7 +167,6 @@ var apiApp = function () {
         })
         .delete(function (req, res) {
             var response = {};
-            // find the data
             user.findById(req.params.id, function (err, data) {
                 if (err) {
                     response = {
@@ -167,7 +174,6 @@ var apiApp = function () {
                         "message": "Error fetching data"
                     };
                 } else {
-                    // data exists, remove it.
                     user.remove({
                         _id: req.params.id
                     }, function (err) {
@@ -188,11 +194,14 @@ var apiApp = function () {
             });
         });
 
+    /**
+     *  /skills (GET/POST)
+     */
+    
     router.route("/skills")
         .get(function (req, res) {
             var response = {};
             skill.find({}, function (err, data) {
-                // Mongo command to fetch all data from collection.
                 if (err) {
                     response = {
                         "error": true,
@@ -207,7 +216,6 @@ var apiApp = function () {
         .post(function (req, res) {
             var db = new skill();
             var response = {};
-            // Needs strict validation when used in production!
             var data = req.body;
             var formattedSkills = [];
 
@@ -234,7 +242,10 @@ var apiApp = function () {
 
         });
 
-    // find users (by skills limited with alumni / staff)
+    /**
+     *  /search (POST)
+     */
+    
     router.route("/search")
         .post(function (req, res) {
             var response = {};
@@ -263,7 +274,6 @@ var apiApp = function () {
             where('staff').equals(staff).
             where('alumni').equals(alumni).
             exec(function (err, data) {
-                // This will run Mongo Query to fetch data based on skills in an array.
                 if (err) {
                     response = {
                         "error": true,
@@ -275,8 +285,11 @@ var apiApp = function () {
                 res.json(response);
             });
         });
+    
+    /**
+     *  /search/count (POST)
+     */
 
-    // find count of users (by skills limited with alumni / staff)
     router.route("/search/count")
         .post(function (req, res) {
             var response = {};
@@ -316,8 +329,11 @@ var apiApp = function () {
                 res.json(response);
             });
         });
-
-    // get user by oauth token
+    
+    /**
+     *  /oauth (POST)
+     */
+    
     router.route("/oauth")
         .post(function (req, res) {
             var response = {};

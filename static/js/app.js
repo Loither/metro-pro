@@ -1,4 +1,16 @@
 $(function () {
+
+    'use strict';
+    /**
+     *  MetroPro client side js, Lauri Lankinen 2016
+     *  javascript file handling events between backend and UI
+     *  uses Google Web sign-in API for oauth login
+     */
+
+    /**
+     *  Page load, setup necessary elements
+     */
+
     updateSkillsArray();
     setUpElements();
     var id;
@@ -7,19 +19,23 @@ $(function () {
         $('#modal-title').html(text);
     }
 
-    function getUserInfo(id_token) {
+    /**
+     *  Fetch user data against oauth token
+     */
+
+    function getUserInfo(profile) {
         $.ajax({
             type: 'POST',
             url: 'http://nodejs-loither.rhcloud.com/oauth',
             data: JSON.stringify({
-                "oauth": id_token
+                "oauth": profile.getId()
             }),
             success: function (data) {
-                if (data[0] != undefined) {
+                if (data[0] !== undefined) {
                     id = data[0]._id;
                     populateUserDataFields(data[0]);
                 } else {
-                    populateSignUpData();
+                    populateSignUpData(profile);
                 }
 
             },
@@ -28,16 +44,24 @@ $(function () {
         });
     }
 
+    /**
+     *  Get user profile from oauth data
+     */
+
     function updateUserInfo(profile) {
-        getUserInfo(profile.getId());
+        getUserInfo(profile);
     }
+
+    /**
+     *  Populate UI data fields with fetched user data
+     */
 
     function populateUserDataFields(user) {
         $('#firstName').val(user.firstName);
         $('#lastName').val(user.lastName);
         $('#email').val(user.email);
         $('#major').val(user.major);
-        if (user.yearCourse != null) {
+        if (user.yearCourse !== null) {
             $('#yearCourse').selectpicker('val', user.yearCourse);
         }
         user.skills.forEach(function (skill) {
@@ -60,7 +84,11 @@ $(function () {
         }
     }
 
-    function populateSignUpData() {
+    /**
+     *  Populate data fields for new user from oauth data
+     */
+
+    function populateSignUpData(profile) {
         setModalHeader('Luo käyttäjätiedot');
         $('#send').html('Tallenna');
         $('#firstName').val(profile.getGivenName());
@@ -68,9 +96,12 @@ $(function () {
         $('#email').val(profile.getEmail());
     }
 
+    /**
+     *  Send api call (add / update user)
+     */
+
     function sendFormData() {
-        //console.log(scrapeFormData());
-        if (id != undefined) {
+        if (id !== undefined) {
             $.ajax({
                 type: 'PUT',
                 url: 'http://nodejs-loither.rhcloud.com/users/' + id,
@@ -103,6 +134,10 @@ $(function () {
         }
     }
 
+    /**
+     *  Fetch user data from UI fields
+     */
+
     function scrapeFormData() {
         var tmpUser = {};
         tmpUser.availability = {};
@@ -113,7 +148,7 @@ $(function () {
             skills.push(item.toLowerCase());
         });
 
-        tmpUser.oauth = profile.getId();
+        tmpUser.oauth = id;
         tmpUser.firstName = $('#firstName').val();
         tmpUser.lastName = $('#lastName').val();
         tmpUser.email = $('#email').val();
@@ -148,11 +183,13 @@ $(function () {
         } else {
             tmpUser.availability.work = false;
         }
-        
-        console.log(JSON.stringify(tmpUser));
 
         return JSON.stringify(tmpUser);
     }
+
+    /**
+     *  Display success / error message with custom text
+     */
 
     function showStatusMessage(message, alert) {
         if (!alert) {
@@ -168,6 +205,10 @@ $(function () {
         }
     }
 
+    /**
+     *  Hide status message
+     */
+
     function resetStatusMessage() {
         setTimeout(function () {
             $('#status').fadeOut('slow');
@@ -178,15 +219,23 @@ $(function () {
 
     }
 
+    /**
+     *  oAuth callback function
+     */
+
     window.onSignIn = function (googleUser) {
         $('#google-sign-in').fadeOut();
         $('#user-info').fadeIn();
-        profile = googleUser.getBasicProfile();
+        var profile = googleUser.getBasicProfile();
         setModalHeader('Muokkaa tietoja');
         $('#send').html('Päivitä');
         $('#send').fadeIn();
         updateUserInfo(profile);
-    }
+    };
+
+    /**
+     *  Search skills from api
+     */
 
     function search(skills) {
         var staff = false;
@@ -209,18 +258,19 @@ $(function () {
             success: function (data) {
                 hideHeader();
                 updateResults(skills, data);
-                //console.log(JSON.stringify(data));
-                //$('#json').html(JSON.stringify(data));
             },
             contentType: "application/json",
             dataType: 'json'
         });
     }
 
+    /**
+     *  Display search results
+     */
+
     function updateResults(skills, results) {
         $('#results').html('');
         if (results.length > 0) {
-            console.log(results);
             $('#results').hide();
             $('#results').append('<div class="col-xs-12"><h3 class="underline">Hakutulokset</h3></div>');
             results.forEach(function (result) {
@@ -232,12 +282,16 @@ $(function () {
         }
     }
 
+    /**
+     *  Render single search result
+     */
+
     function renderResult(result, skills) {
         var element = '<div class="col-xs-12 col-md-4 result"><div class="inner">';
-        if(result.firstName != undefined && result.lastName != undefined){
+        if (result.firstName !== undefined && result.lastName !== undefined) {
             element += '<h5>' + result.firstName + ' ' + result.lastName + '</h5>';
         }
-        if (result.yearCourse < 5 && result.major != undefined) {
+        if (result.yearCourse < 5 && result.major !== undefined) {
             element += '<p>' + result.major + ' <span class="small">(' + result.yearCourse + '. vuosi)</span></p>';
         } else if (result.staff && result.alumni) {
             element += '<p>henkilökunta, alumni</p>';
@@ -249,34 +303,42 @@ $(function () {
         element += '<p class="skills">';
         result.skills.forEach(function (skill) {
             if (skills.indexOf(skill.toLowerCase()) != -1) {
-                element += '<span class="tagged">'+ skill + '</span> ';
+                element += '<span class="tagged">' + skill + '</span> ';
             } else {
                 element += '<span class="other">' + skill + '</span> ';
             }
         });
         element += '</p>';
-        if(result.email != undefined){
+        if (result.email !== undefined) {
             element += '<p class="email"><span class="fui-mail"> ' + result.email + '</p>';
         }
         element += '<p>Kiinnostunut </br>';
-        if (result.availability.inno){
+        if (result.availability.inno) {
             element += '<span class="other">Innoprojektista</span> ';
-        } 
-        if (result.availability.thesis){
+        }
+        if (result.availability.thesis) {
             element += '<span class="other">Päättötyöstä</span> ';
         }
-        if (result.availability.work){
+        if (result.availability.work) {
             element += '<span class="other">Palkkatyöstä</span> ';
         }
         element += '</p>';
-        element += '</div></div>'
+        element += '</div></div>';
         return element;
 
     }
 
+    /**
+     *  Hide header when initiating search
+     */
+
     function hideHeader() {
         $('.headline').fadeOut('slow');
     }
+
+    /**
+     *  Setup dynamic elements on page load
+     */
 
     function setUpElements() {
         $('.main').fadeIn('slow');
@@ -293,6 +355,10 @@ $(function () {
         $(':checkbox').checkbox();
     }
 
+    /**
+     *  Render tags in skills array to tagged search field
+     */
+
     function updateSkillsArray() {
         $.get('http://nodejs-loither.rhcloud.com/skills', function (items) {
             var skills = [];
@@ -303,6 +369,10 @@ $(function () {
         });
     }
 
+    /**
+     *  Initiate all tagged inputs
+     */
+
     function setUpTagsInput(skills) {
         $('.tagsinput').tagsInput({
             autocomplete: {
@@ -312,6 +382,5 @@ $(function () {
             }
         });
     }
-
 
 });
