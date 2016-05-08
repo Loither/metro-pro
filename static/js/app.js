@@ -118,7 +118,7 @@ $(function () {
         tmpUser.lastName = $('#lastName').val();
         tmpUser.email = $('#email').val();
         tmpUser.major = $('#major').val();
-        tmpUser.yearCourse = $('#yearCourse').val();   
+        tmpUser.yearCourse = $('#yearCourse').val();
 
         if ($('#alumni').is(':checked')) {
             tmpUser.alumni = true;
@@ -148,6 +148,8 @@ $(function () {
         } else {
             tmpUser.availability.work = false;
         }
+        
+        console.log(JSON.stringify(tmpUser));
 
         return JSON.stringify(tmpUser);
     }
@@ -182,6 +184,7 @@ $(function () {
         profile = googleUser.getBasicProfile();
         setModalHeader('Muokkaa tietoja');
         $('#send').html('Päivitä');
+        $('#send').fadeIn();
         updateUserInfo(profile);
     }
 
@@ -204,11 +207,75 @@ $(function () {
                 "skills": skills
             }),
             success: function (data) {
-                $('#json').html(JSON.stringify(data));
+                hideHeader();
+                updateResults(skills, data);
+                //console.log(JSON.stringify(data));
+                //$('#json').html(JSON.stringify(data));
             },
             contentType: "application/json",
             dataType: 'json'
         });
+    }
+
+    function updateResults(skills, results) {
+        $('#results').html('');
+        if (results.length > 0) {
+            console.log(results);
+            $('#results').hide();
+            $('#results').append('<div class="col-xs-12"><h3 class="underline">Hakutulokset</h3></div>');
+            results.forEach(function (result) {
+                $('#results').append(renderResult(result, skills));
+            });
+            $('#results').fadeIn('slow');
+        } else {
+            $('#results').hide().append('<p>Ei tuloksia. Kokeile hakea uudestaan.</p>').fadeIn('slow');
+        }
+    }
+
+    function renderResult(result, skills) {
+        var element = '<div class="col-xs-12 col-md-4 result"><div class="inner">';
+        if(result.firstName != undefined && result.lastName != undefined){
+            element += '<h5>' + result.firstName + ' ' + result.lastName + '</h5>';
+        }
+        if (result.yearCourse < 5 && result.major != undefined) {
+            element += '<p>' + result.major + ' <span class="small">(' + result.yearCourse + '. vuosi)</span></p>';
+        } else if (result.staff && result.alumni) {
+            element += '<p>henkilökunta, alumni</p>';
+        } else if (result.staff) {
+            element += '<p>henkilökunta</p>';
+        } else if (result.alumni) {
+            element += '<p>alumni</p>';
+        }
+        element += '<p class="skills">';
+        result.skills.forEach(function (skill) {
+            if (skills.indexOf(skill.toLowerCase()) != -1) {
+                element += '<span class="tagged">'+ skill + '</span> ';
+            } else {
+                element += '<span class="other">' + skill + '</span> ';
+            }
+        });
+        element += '</p>';
+        if(result.email != undefined){
+            element += '<p class="email"><span class="fui-mail"> ' + result.email + '</p>';
+        }
+        element += '<p>Kiinnostunut </br>';
+        if (result.availability.inno){
+            element += '<span class="other">Innoprojektista</span> ';
+        } 
+        if (result.availability.thesis){
+            element += '<span class="other">Päättötyöstä</span> ';
+        }
+        if (result.availability.work){
+            element += '<span class="other">Palkkatyöstä</span> ';
+        }
+        element += '</p>';
+        element += '</div></div>'
+        return element;
+
+    }
+
+    function hideHeader() {
+        $('.headline').fadeOut('slow');
     }
 
     function setUpElements() {

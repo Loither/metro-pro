@@ -21,14 +21,14 @@ var userSchema = {
     "lastName": String,
     "email": {type: String, unique: true},
     "major": String,
-    "yearCourse": {type: Number, min: 1, max: 4},
+    "yearCourse": {type: Number, min: 1, max: 5},
     "alumni": Boolean,
     "staff": Boolean,
     "skills": Array,
     "availability": {
         "inno": Boolean,
         "thesis": Boolean,
-        "job": Boolean
+        "work": Boolean
     }
 };
 // create model if one does not exist.

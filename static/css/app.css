@@ -22,10 +22,21 @@ body {
     letter-spacing: 0;
 }
 
+.header-logo {
+    height: 30px;
+    margin-top: -10px !important;
+    margin-right: 10px !important;
+}
+
 .main {
-    margin-top: 50px;
+    margin-top: 0px;
+    margin-bottom: 10px;
     max-width: 1170px;
     display: none;
+}
+
+.headline {
+    margin-top: 20px;
 }
 
 ul.dropdown-menu.dropdown-inverse {
@@ -65,4 +76,61 @@ input[type="text"] {
 .text-left {
     text-align: left;
     margin-left: 14px;
+}
+
+.small {
+    font-size: 80%;
+    font-weight: 300;
+}
+
+.tagged {
+    padding: 5px;
+    background-color: #1abc9c;
+    color: #ffffff;
+    font-size: 70%;
+    border-radius: 4px;
+    margin-bottom: 3px;
+}
+
+.other {
+    padding: 5px;
+    background-color: #e5e9ea;
+    color: #bdc3c7;
+    font-size: 70%;
+    border-radius: 4px;
+    margin-bottom: 3px;
+}
+
+#send {
+    display: none;
+}
+
+.result {
+    padding: 10px;
+}
+
+.inner {
+    border: 1px solid rgba(10, 74, 61, .1);
+}
+
+.email {
+    color: #1abc9c;
+    font-size: 70%;
+    font-weight: 100;
+}
+
+.interests {
+    text-align: left;
+    font-size: 90%;
+    font-weight: 100;
+}
+
+.underline {
+    border-bottom: 1px solid #1abc9c;
+    padding: 10px;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 30px;
+    max-width: 300px;
+    text-align: center;
 }
